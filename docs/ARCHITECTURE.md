@@ -30,3 +30,7 @@ The local `Makefile` builds one canonically named shared object directly from th
 The existing Common resource package continues to own the installed path. An independent installer, package handover, release workflow and published release are separate work. This source copy does not claim those steps are complete.
 
 See [provenance](../SOURCE.md), [file manifest](../SOURCE-MANIFEST.json), [model](MODEL.md) and [validation](VALIDATION.md).
+
+## Owned lunar chronology requalification
+
+Provider-owned Korean lunisolar year data for 1900–2100, independently checked against KASI-based dates from 1900-01-31 through 2050-11-18; later owned dates are predictions. ICU supplies locale text and the retained projection outside that year table. The current implementation and test counts are described in `FORENSIC-AUDIT.md`. Initial extraction hashes and copy-comparison results remain historical provenance.

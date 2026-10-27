@@ -4,31 +4,23 @@
   "id": "dangi",
   "name": "Korean Dangi Calendar",
   "kind": "calendar",
-  "base_commit": "83bb5f40b2332d9bd46bf2b7e09a2d68594d458d",
+  "base_commit": "fbd83dc13c903d293e86acb659ca8b9bacc1d961",
   "model_checks": {
-    "repository": "Calendar-Dangi",
-    "id": "dangi",
-    "reference_cases": 29256,
+    "reference_cases": 55079,
     "reference_mismatches": 0,
-    "navigation_cases": 1140,
-    "navigation_failures": 0,
-    "model_notes": []
+    "reference": "KASI-based 1900-01-31 through 2050-11-18",
+    "method": "Independent source-day fields versus owned packed-year implementation"
   },
   "navigation": {
-    "repository": "Calendar-Dangi",
-    "id": "dangi",
-    "cases": 946,
-    "failures": 0
+    "cases": 40827,
+    "failures": 0,
+    "method": "Independently enumerated published month periods, day clamping, leap-month policy"
   },
   "external_comparisons": [
     {
-      "repository": "Calendar-Dangi",
-      "reference": "korean-lunar-calendar 0.4.0 (KASI-based data)",
+      "reference": "KASI-based 1900-01-31 through 2050-11-18",
       "cases": 55079,
-      "mismatches": 30,
-      "mismatch_years": {
-        "2017": 30
-      }
+      "mismatches": 0
     }
   ],
   "undefined_behavior_and_invariants": {
@@ -45,14 +37,20 @@
   "independent_fixture_count": 116,
   "authority_fixture_count": 1,
   "corrections": [
-    "Resolve ICU lazy fields before restoring/clamping a destination day; month navigation now moves and clamps correctly."
+    "Resolve ICU lazy fields before restoring/clamping a destination day; month navigation now moves and clamps correctly.",
+    "Replace approximate ICU astronomy with owned packed year facts for 1900–2100. Fields, month/year navigation, starts and localized text use the same chronology; joins to the retained projection are tested."
   ],
   "limitations": [
-    "Confirmed KASI 2017 disagreement on ICU 74. Run make audit-authorities to reproduce; these are not hidden by the passing model tests.",
-    "Finite sampled checks establish only the stated model/ranges. They do not certify every historical region, all translations, every host ICU/CLDR release, or another operating system/architecture."
+    "Owned lunar-year facts cover 1900–2100; outside that table, the existing ICU projection is retained and is not independently certified as historical truth.",
+    "Matching published future calendar predictions does not guarantee future promulgations or Earth-rotation assumptions.",
+    "Locale text is supplied by the installed ICU/CLDR; fields and navigation in the owned range do not use ICU astronomy."
   ],
   "source_changes": [
-    "src/calendars/engine/icu-calendar.c"
+    "src/calendars/engine/icu-calendar.c",
+    "src/calendars/engine/icu-calendar.h",
+    "src/calendars/engine/icu-compat-bridge.c",
+    "src/lunar-data.h",
+    "src/provider.c"
   ],
   "baseline_cases_updated": 28,
   "references": {
@@ -67,5 +65,50 @@
     "KASI": "https://astro.kasi.re.kr/life/pageView/5?search_year=2017&search_month=02&search_dp=1&search_check=G",
     "HijriDate": "https://hijridate.readthedocs.io/en/stable/background.html",
     "Persian": "https://github.com/unicode-org/icu/blob/main/icu4c/source/i18n/persncal.cpp"
+  },
+  "phase_one_model_checks": {
+    "repository": "Calendar-Dangi",
+    "id": "dangi",
+    "reference_cases": 29256,
+    "reference_mismatches": 0,
+    "navigation_cases": 1140,
+    "navigation_failures": 0,
+    "model_notes": []
+  },
+  "phase_one_external_comparisons": [
+    {
+      "repository": "Calendar-Dangi",
+      "reference": "korean-lunar-calendar 0.4.0 (KASI-based data)",
+      "cases": 55079,
+      "mismatches": 30,
+      "mismatch_years": {
+        "2017": 30
+      }
+    }
+  ],
+  "phase_one_navigation": {
+    "repository": "Calendar-Dangi",
+    "id": "dangi",
+    "cases": 946,
+    "failures": 0
+  },
+  "current_requalification": {
+    "published_date_checks": 55079,
+    "navigation_checks": 40827,
+    "day_format_checks": 3731,
+    "projection_seam": {
+      "repository": "Calendar-Dangi",
+      "cases": 2324,
+      "failures": [],
+      "continuity_errors": []
+    },
+    "ubsan": {
+      "repository": "Calendar-Dangi",
+      "operations": 25305,
+      "invariant_failures": 0,
+      "examples": []
+    },
+    "locale_rendering_cases": 195,
+    "locale_failures": 0
   }
 }

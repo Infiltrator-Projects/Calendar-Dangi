@@ -2,7 +2,7 @@
 
 **InfiltratorOS calendar resource** · **Stable ID:** `dangi` · **Module:** `Korean Dangi Calendar.so`
 
-ICU Korean Dangi computational lunisolar calendar with localized cyclical fields.
+Provider-owned Korean lunisolar year data for 1900–2100, independently checked against KASI-based dates from 1900-01-31 through 2050-11-18; later owned dates are predictions. ICU supplies locale text and the retained projection outside that year table.
 
 **Historical scope/accuracy:** Retrospective conversion is not certified against historic Korean local calculation.
 

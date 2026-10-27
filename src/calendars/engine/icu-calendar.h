@@ -26,6 +26,9 @@ gint64 calendar_icu_add_years(const gchar *calendar_keyword,
                                    gint64 jdn,
                                    gint amount);
 
+gchar *calendar_icu_format_pattern(const gchar *keyword, gint64 jdn, const gchar *pattern);
+gboolean calendar_icu_month_difference(const gchar *keyword, gint64 from, gint64 to, gint32 *difference);
+
 G_END_DECLS
 
 #endif

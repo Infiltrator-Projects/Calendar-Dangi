@@ -1,0 +1,21 @@
+{
+  "model": "korea",
+  "source": "Unicode ICU4X precomputed EastAsianTraditional data",
+  "first_lunar_year": 1900,
+  "last_lunar_year": 2100,
+  "files": [
+    {
+      "url": "https://raw.githubusercontent.com/unicode-org/icu4x/main/components/calendar/src/cal/east_asian_traditional/qing_data.rs",
+      "sha256": "e8097d4ba4651863644ef2ed7247d57640e949eb2c2ef207a2d8ebf9b5c4f69e",
+      "git_blob_sha": "c107d7f82118efce503ac1225a5db9ca22b5afe8",
+      "immutable_api_url": "https://api.github.com/repos/unicode-org/icu4x/git/blobs/c107d7f82118efce503ac1225a5db9ca22b5afe8"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/unicode-org/icu4x/main/components/calendar/src/cal/east_asian_traditional/korea_data.rs",
+      "sha256": "109acbffe1cf64ce20bf483752f5c1d2f6b8cae07b6a75e17e79e0f2a20eb69f",
+      "git_blob_sha": "748e36bd918d39ac9a0bb720dabc254cc5fa64f7",
+      "immutable_api_url": "https://api.github.com/repos/unicode-org/icu4x/git/blobs/748e36bd918d39ac9a0bb720dabc254cc5fa64f7"
+    }
+  ],
+  "independent_reference": "KASI-based 1900-01-31 through 2050-11-18"
+}

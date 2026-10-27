@@ -34,6 +34,7 @@ all:
 check: all
 	$(PYTHON) tests/check_provider.py "$(TARGET)"
 	LANGUAGE=en_US LC_ALL=C.UTF-8 $(PYTHON) tests/check_accuracy.py "$(TARGET)"
+	LANGUAGE=en_US LC_ALL=C.UTF-8 $(PYTHON) tests/check_published_dates.py "$(TARGET)"
 audit-authorities: all
 	LANGUAGE=en_US LC_ALL=C.UTF-8 $(PYTHON) tests/check_accuracy.py "$(TARGET)" --authorities
 clean:

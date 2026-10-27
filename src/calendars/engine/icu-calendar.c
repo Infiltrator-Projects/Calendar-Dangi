@@ -242,12 +242,9 @@ pattern_for_part(CalendarCalendarMode mode,
 }
 
 gchar *
-calendar_icu_format(CalendarCalendarMode format_profile,
-                         const gchar *calendar_keyword,
-                         gint64 jdn,
-                         CalendarDatePart part)
+calendar_icu_format_pattern(const gchar *calendar_keyword,
+                            gint64 jdn, const gchar *pattern)
 {
-    (void)format_profile;
     UErrorCode status = U_ZERO_ERROR;
     gchar locale[ULOC_FULLNAME_CAPACITY];
     UChar pattern_utf16[128];
@@ -259,7 +256,6 @@ calendar_icu_format(CalendarCalendarMode format_profile,
     gint32 capacity = G_N_ELEMENTS(stack_buffer);
     gint32 length;
     gchar *result;
-    const gchar *pattern = pattern_for_part(format_profile, part);
     UDate utc_noon;
 
     if (!jdn_to_udate(jdn, &utc_noon)) return g_strdup("");
@@ -425,4 +421,28 @@ calendar_icu_add_years(const gchar *calendar_keyword,
                             gint amount)
 {
     return icu_add(calendar_keyword, jdn, UCAL_YEAR, amount);
+}
+
+gchar *calendar_icu_format(CalendarCalendarMode mode, const gchar *keyword,
+                            gint64 jdn, CalendarDatePart part)
+{
+    return calendar_icu_format_pattern(keyword, jdn, pattern_for_part(mode, part));
+}
+
+gboolean calendar_icu_month_difference(const gchar *keyword, gint64 from,
+                                        gint64 to, gint32 *difference)
+{
+    UDate start, finish;
+    UErrorCode status = U_ZERO_ERROR;
+    if (difference == NULL || !jdn_to_udate(from, &start) ||
+        !jdn_to_udate(to, &finish)) return FALSE;
+    UCalendar *calendar = open_icu_calendar(keyword, &status);
+    if (calendar == NULL || U_FAILURE(status)) return FALSE;
+    ucal_setMillis(calendar, start, &status);
+    const int32_t result = ucal_getFieldDifference(calendar, finish, UCAL_MONTH, &status);
+    const UDate reached = ucal_getMillis(calendar, &status);
+    ucal_close(calendar);
+    if (U_FAILURE(status) || reached != finish) return FALSE;
+    *difference = result;
+    return TRUE;
 }

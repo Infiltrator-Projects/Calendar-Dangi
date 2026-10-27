@@ -52,6 +52,7 @@ typedef struct
                                UCalendarType, UErrorCode *);
     void (*ucal_close_fn)(UCalendar *);
     UDate (*ucal_get_millis)(const UCalendar *, UErrorCode *);
+    int32_t (*ucal_field_difference)(UCalendar *, UDate, UCalendarDateFields, UErrorCode *);
     void (*ucal_set_millis)(UCalendar *, UDate, UErrorCode *);
     void (*ucal_add_fn)(UCalendar *, UCalendarDateFields, int32_t,
                         UErrorCode *);
@@ -160,6 +161,7 @@ try_icu_major(const char *major,
     LOAD_I18N(ucal_get_millis, "ucal_getMillis");
     LOAD_I18N(ucal_set_millis, "ucal_setMillis");
     LOAD_I18N(ucal_add_fn, "ucal_add");
+    LOAD_I18N(ucal_field_difference, "ucal_getFieldDifference");
     LOAD_I18N(ucal_get_fn, "ucal_get");
     LOAD_I18N(ucal_set_fn, "ucal_set");
     LOAD_I18N(ucal_get_limit, "ucal_getLimit");
@@ -490,4 +492,12 @@ udat_setCalendar(UDateFormat *format,
     IcuBridgeApi *api = get_bridge();
     if (api != NULL)
         api->udat_set_calendar_fn(format, calendar);
+}
+
+int32_t ucal_getFieldDifference(UCalendar *calendar, UDate when,
+                               UCalendarDateFields field, UErrorCode *status)
+{
+    IcuBridgeApi *api = get_bridge();
+    if (api == NULL) { set_missing(status); return 0; }
+    return api->ucal_field_difference(calendar, when, field, status);
 }
