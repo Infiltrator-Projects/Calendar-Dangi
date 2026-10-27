@@ -1,0 +1,18 @@
+[
+  {
+    "op": "fields",
+    "args": [
+      2457811
+    ],
+    "expected": [
+      true,
+      34,
+      2,
+      1,
+      78,
+      false
+    ],
+    "source": "https://astro.kasi.re.kr/life/pageView/5?search_year=2017&search_month=02&search_dp=1&search_check=G",
+    "date": "2017-02-26"
+  }
+]

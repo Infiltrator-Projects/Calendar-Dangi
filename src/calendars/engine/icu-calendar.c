@@ -369,6 +369,13 @@ icu_add(const gchar *calendar_keyword,
     original_day = ucal_get(calendar, UCAL_DATE, &status);
     ucal_set(calendar, UCAL_DATE, 1);
     ucal_add(calendar, field, amount, &status);
+    /* Resolve the new instant and discard stale field stamps before
+     * restoring the day. Chinese/Dangi month addition otherwise reverts
+     * to the original month when UCAL_DATE is set again (ICU 74). */
+    const UDate shifted = ucal_getMillis(calendar, &status);
+    ucal_setMillis(calendar, shifted, &status);
+    /* getLimit does not complete lazy Chinese month fields itself. */
+    (void)ucal_get(calendar, UCAL_MONTH, &status);
     maximum_day = ucal_getLimit(calendar,
                                 UCAL_DATE,
                                 UCAL_ACTUAL_MAXIMUM,

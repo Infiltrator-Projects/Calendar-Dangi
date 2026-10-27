@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-27",
+  "repository": "Calendar-Dangi",
+  "id": "dangi",
+  "name": "Korean Dangi Calendar",
+  "kind": "calendar",
+  "base_commit": "83bb5f40b2332d9bd46bf2b7e09a2d68594d458d",
+  "model_checks": {
+    "repository": "Calendar-Dangi",
+    "id": "dangi",
+    "reference_cases": 29256,
+    "reference_mismatches": 0,
+    "navigation_cases": 1140,
+    "navigation_failures": 0,
+    "model_notes": []
+  },
+  "navigation": {
+    "repository": "Calendar-Dangi",
+    "id": "dangi",
+    "cases": 946,
+    "failures": 0
+  },
+  "external_comparisons": [
+    {
+      "repository": "Calendar-Dangi",
+      "reference": "korean-lunar-calendar 0.4.0 (KASI-based data)",
+      "cases": 55079,
+      "mismatches": 30,
+      "mismatch_years": {
+        "2017": 30
+      }
+    }
+  ],
+  "undefined_behavior_and_invariants": {
+    "repository": "Calendar-Dangi",
+    "operations": 25812,
+    "invariant_failures": 0,
+    "exit": 0
+  },
+  "locale_rendering": {
+    "locales": 13,
+    "cases": 195,
+    "failures": 0
+  },
+  "independent_fixture_count": 116,
+  "authority_fixture_count": 1,
+  "corrections": [
+    "Resolve ICU lazy fields before restoring/clamping a destination day; month navigation now moves and clamps correctly."
+  ],
+  "limitations": [
+    "Confirmed KASI 2017 disagreement on ICU 74. Run make audit-authorities to reproduce; these are not hidden by the passing model tests.",
+    "Finite sampled checks establish only the stated model/ranges. They do not certify every historical region, all translations, every host ICU/CLDR release, or another operating system/architecture."
+  ],
+  "source_changes": [
+    "src/calendars/engine/icu-calendar.c"
+  ],
+  "baseline_cases_updated": 28,
+  "references": {
+    "calendrical": "https://reingold.co/calendars.shtml",
+    "convertdate": "https://convertdate.readthedocs.io/",
+    "ICU": "https://unicode-org.github.io/icu/userguide/datetime/calendar/",
+    "NOAA": "https://gml.noaa.gov/grad/solcalc/solareqns.PDF",
+    "USNO": "https://aa.usno.navy.mil/faq/GAST",
+    "NAOJ": "https://eco.mtk.nao.ac.jp/koyomi/wiki/C7F6CCC02FCCEBCCC0A4C8C6FCCAEB.html",
+    "BWC": "https://bahai-library.com/pdf/uhj/uhj_bahai_dates_172-221.pdf",
+    "HKO": "https://www.hko.gov.hk/en/gts/time/conversion.htm",
+    "KASI": "https://astro.kasi.re.kr/life/pageView/5?search_year=2017&search_month=02&search_dp=1&search_check=G",
+    "HijriDate": "https://hijridate.readthedocs.io/en/stable/background.html",
+    "Persian": "https://github.com/unicode-org/icu/blob/main/icu4c/source/i18n/persncal.cpp"
+  }
+}
