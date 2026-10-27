@@ -14,6 +14,8 @@ Provider-owned Korean lunisolar year data for 1900–2100, independently checked
 
 The table is packed from Unicode ICU4X year facts, whose source URLs and hashes are retained in `LUNAR-DATA-PROVENANCE.json`. Independent government/table data are stored as compact month references in `tests/published-months.json`; they do not come from provider output. Unicode license notices are retained in `licenses/Unicode-3.0.txt`.
 
-Period navigation uses month ordinals, including intercalary months. Year navigation preserves the existing policy: if a leap month is absent in the target year, use the following ordinary month. Day numbers clamp to the target month's length. Localized month/cycle/day text is composed from checked ICU text samples, retaining the real JDN weekday; it cannot replace the owned date with ICU's approximate date.
+Period navigation uses month ordinals, including intercalary months. Year navigation has an explicit policy: if a leap month is absent in the target year, use the following ordinary month. Day numbers clamp to the target month's length. Localized month/cycle/day text is composed from checked ICU text samples, retaining the real JDN weekday; it cannot replace the owned date with ICU's approximate date.
 
 Finite tests establish the stated model and checked ranges. They do not certify every historical regional calendar, future official changes, every ICU/CLDR version or another operating system. Date-only JDN fields do not implement an intraday sunset rollover.
+
+When both endpoints lie outside the owned table, nonzero navigation retains the existing ICU projection. Zero-step navigation is always identity, including a distant Dangi case where the old projection accidentally moved by two months. This preserves projection compatibility without presenting it as historically verified.

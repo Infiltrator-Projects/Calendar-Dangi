@@ -34,7 +34,7 @@
     "cases": 195,
     "failures": 0
   },
-  "independent_fixture_count": 116,
+  "independent_fixture_count": 118,
   "authority_fixture_count": 1,
   "corrections": [
     "Resolve ICU lazy fields before restoring/clamping a destination day; month navigation now moves and clamps correctly.",
@@ -104,11 +104,53 @@
     },
     "ubsan": {
       "repository": "Calendar-Dangi",
-      "operations": 25305,
+      "operations": 25779,
       "invariant_failures": 0,
       "examples": []
     },
     "locale_rendering_cases": 195,
-    "locale_failures": 0
+    "locale_failures": 0,
+    "projection_compatibility": {
+      "repository": "Calendar-Dangi",
+      "cases": 4627,
+      "regressions": 0,
+      "examples": [],
+      "legacy_identity_defects_corrected": [
+        {
+          "case": {
+            "op": "periods",
+            "args": [
+              2798212,
+              0
+            ]
+          },
+          "before": [
+            true,
+            2798271
+          ],
+          "after": [
+            true,
+            2798212
+          ]
+        },
+        {
+          "case": {
+            "op": "years",
+            "args": [
+              2798212,
+              0
+            ]
+          },
+          "before": [
+            true,
+            2798271
+          ],
+          "after": [
+            true,
+            2798212
+          ]
+        }
+      ]
+    }
   }
 }

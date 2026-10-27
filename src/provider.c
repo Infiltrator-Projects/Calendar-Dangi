@@ -175,6 +175,17 @@ static bool periods(const InfiltratrTemporalCalendarProvider *self,
     int64_t index;
     if (out == NULL || !chronology_fields(jdn, &original)) return FALSE;
     if (amount == 0) { *out = jdn; return TRUE; }
+    if (!date_at(jdn, NULL, NULL)) {
+        /* Retain the established projection for operations whose two
+         * endpoints are outside the owned table. Do not route a remote
+         * proleptic date through an unnecessary modern-month anchor. */
+        const int64_t projected = calendar_icu_add_months(RESOURCE_KEYWORD, jdn, amount);
+        if (projected != G_MAXINT64 && !date_at(projected, NULL, NULL) &&
+            chronology_fields(projected, &check)) {
+            *out = projected;
+            return TRUE;
+        }
+    }
     int64_t first = 0, after = 0;
     if (!date_at(jdn, NULL, &index)) {
         if (!anchors(&first, &after)) return FALSE;
@@ -212,6 +223,14 @@ static bool years(const InfiltratrTemporalCalendarProvider *self,
     CalendarCalendarFields original, check;
     if (out == NULL || !chronology_fields(jdn, &original)) return FALSE;
     if (amount == 0) { *out = jdn; return TRUE; }
+    if (!date_at(jdn, NULL, NULL)) {
+        const int64_t projected = calendar_icu_add_years(RESOURCE_KEYWORD, jdn, amount);
+        if (projected != G_MAXINT64 && !date_at(projected, NULL, NULL) &&
+            chronology_fields(projected, &check)) {
+            *out = projected;
+            return TRUE;
+        }
+    }
     int64_t target_year = related_year(&original) + amount;
     int target_month = original.month;
     gboolean target_leap = original.special;
@@ -219,8 +238,9 @@ static bool years(const InfiltratrTemporalCalendarProvider *self,
     gboolean found = month_key(target_year, target_month, target_leap, NULL, &month);
     if (!found && (target_year < LUNAR_FIRST_YEAR || target_year > LUNAR_LAST_YEAR))
         found = projected_month(target_year, target_month, target_leap, &month);
-    /* Preserve the existing ICU year-add policy: an absent leap month
-     * normalizes into the following ordinary month. */
+    /* Explicit year-add normalization: an absent leap month maps to the
+     * following ordinary month. This keeps the tested native-range policy
+     * deterministic instead of inheriting ICU leniency inconsistencies. */
     if (!found && target_leap) {
         target_leap = FALSE;
         if (++target_month > 12) { target_month = 1; ++target_year; }
