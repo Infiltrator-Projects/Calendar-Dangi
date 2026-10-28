@@ -1,36 +1,3 @@
-# Korean Dangi Calendar — architecture and source boundaries
+# Korean Dangi Calendar
 
-## Current source ownership
-
-This repository now contains a local, independently buildable **copy** of provider `dangi`. `src/provider.c` contains the selected native ABI adapter. The other files under `src/` contain only reached supporting implementation definitions; `include/` contains the required Common ABI headers and this provider's build configuration.
-
-The original implementation, combined build and installed package remain in Common. Nothing is deleted from Common, and no current package ownership is changed.
-
-## Copied shared code
-
-Required shared helpers are copied locally, including arithmetic, date coordinates, localization or ICU bridging where this provider uses them. Multiple provider repositories intentionally contain their own copies of these helpers. Combined implementation files were selected and reduced to this provider's reachable operations and data; unrelated executable provider implementations are excluded.
-
-Public ABI declarations preserve compatibility with existing consumers. Private selector numeric values are retained where needed, while the other private selectors are removed. No other provider is registered or exported by this module.
-
-## Native resource contract
-
-- **Stable identity:** `dangi`, kind `calendar`, canonical name `Korean Dangi Calendar`.
-- **Metadata entry:** `infiltratr_temporal_resource_metadata_v1`.
-- **Executable entry:** `infiltratr_temporal_calendar_provider_v1`.
-- **Canonical file:** `Korean Dangi Calendar.so`.
-- **Native directory:** `/System/Resources/Calendars`.
-- **Consumers:** Common's validated loader, used by Calendar, Files, System Settings and other compatible clients.
-- **Failure boundaries:** a missing or invalid provider is unavailable; it must not be replaced by a different provider or alter canonical instants.
-- **Trust boundary:** native module code executes in the loading process and is intended for trusted installed resources.
-
-## Build and packaging
-
-The local `Makefile` builds one canonically named shared object directly from this repository, with hidden helper symbols and only the two versioned native entry points exported. It requires no Common checkout, Common archive, sibling resource repository or source download.
-
-The existing Common resource package continues to own the installed path. An independent installer, package handover, release workflow and published release are separate work. This source copy does not claim those steps are complete.
-
-See [provenance](../SOURCE.md), [file manifest](../SOURCE-MANIFEST.json), [model](MODEL.md) and [validation](VALIDATION.md).
-
-## Owned lunar chronology requalification
-
-Provider-owned Korean lunisolar year data for 1900–2100, independently checked against KASI-based dates from 1900-01-31 through 2050-11-18; later owned dates are predictions. ICU supplies locale text and the retained projection outside that year table. The current implementation and test counts are described in `FORENSIC-AUDIT.md`. Initial extraction hashes and copy-comparison results remain historical provenance.
+The Korean Dangi chronology and locale-specific year naming are owned by this provider. Common 1.19.80 (dc4aac326964ca4400b6e21851d16eea674040c8) owns generic numeric, civil coordinate, and resource ABI mechanisms. The provider compiles and links its exact Common submodule archive and no longer carries private Common source/header copies. Model, ICU and offline native installer checks remain CI gates.
