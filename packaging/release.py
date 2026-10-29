@@ -227,12 +227,6 @@ def build_deb(profile, output, jobs):
             f"X-Infiltrator-PGO: {'trained-two-pass' if profile == 'aggressive' else 'disabled'}\n"
             f"X-Infiltrator-Cflags: {shlex.join(flags)}\n"
             f"X-Infiltrator-Resource-SHA256: {hashlib.sha256(target.read_bytes()).hexdigest()}\n"
-            f"X-Infiltrator-Source-Revision: {revision()}\n"
-            f"X-Infiltrator-Native-Profile: {profile}\n"
-            f"X-Infiltrator-LTO: enabled\n"
-            f"X-Infiltrator-PGO: {'trained-two-pass' if profile == 'aggressive' else 'disabled'}\n"
-            f"X-Infiltrator-Cflags: {shlex.join(flags)}\n"
-            f"X-Infiltrator-Resource-SHA256: {hashlib.sha256(target.read_bytes()).hexdigest()}\n"
             f"Description: {MANIFEST['name']} temporal resource\n"
             " Independently owned provider module for Infiltrator temporal consumers.\n")
         for directory, _, names in os.walk(stage):
