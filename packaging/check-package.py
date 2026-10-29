@@ -23,26 +23,35 @@ with tempfile.TemporaryDirectory(prefix="provider-payload-") as temporary:
     root = Path(temporary)
     subprocess.run(["dpkg-deb", "--extract", package, root], check=True)
     files = [p for p in root.rglob("*") if not p.is_dir()]
+    locales = ROOT / "i18n/LINGUAS"
+    translated_paths = set()
+    if locales.exists():
+        translated_paths = {Path("usr/share/locale") / language.strip() / "LC_MESSAGES" / (expected + ".mo")
+                            for language in locales.read_text().splitlines() if language.strip() and not language.strip().startswith("#")}
     assert sum(p.suffix == ".so" for p in files) == 1
     for file in files:
         relative = file.relative_to(root)
         assert not file.is_symlink()
-        assert relative == resource or relative.is_relative_to(documentation), relative
+        assert relative in {resource, documentation / (manifest["name"] + ".pdf")}, relative
         assert file.stat().st_mode & 0o777 == 0o644, relative
     library = root / resource
-    info = (root / documentation / "BUILD-INFO").read_text()
-    assert f"Profile: {profile}\n" in info
-    assert "LTO: enabled\n" in info
-    assert f"SHA256: {hashlib.sha256(library.read_bytes()).hexdigest()}\n" in info
+    guide = root / documentation / (manifest["name"] + ".pdf")
+    assert guide.read_bytes().startswith(b"%PDF-")
+    def field(name):
+        return subprocess.check_output(["dpkg-deb", "-f", package, name], text=True).strip()
+    assert field("X-Infiltrator-Native-Profile") == profile
+    assert field("X-Infiltrator-LTO") == "enabled"
+    assert field("X-Infiltrator-Resource-SHA256") == hashlib.sha256(library.read_bytes()).hexdigest()
     if profile == "aggressive":
-        assert "PGO: trained two-pass profile\n" in info
-        assert "C flags: -O3 " in info
-        assert "-march=native" in info or "-mcpu=native" in info
+        assert field("X-Infiltrator-PGO") == "trained-two-pass"
+        assert field("X-Infiltrator-Cflags").startswith("-O3 ")
+        assert "-march=native" in field("X-Infiltrator-Cflags") or "-mcpu=native" in field("X-Infiltrator-Cflags")
     else:
-        assert "-march=native" not in info and "-mcpu=native" not in info
+        assert field("X-Infiltrator-PGO") == "disabled" and "-march=native" not in field("X-Infiltrator-Cflags") and "-mcpu=native" not in field("X-Infiltrator-Cflags")
     symbols = subprocess.check_output(["readelf", "--dyn-syms", "--wide", library], text=True)
     assert "__gcov" not in symbols, "Instrumented training binary leaked into package"
     env = dict(os.environ, LANGUAGE="en_US", LC_ALL="C.UTF-8")
     for check in ("check_provider.py", "check_accuracy.py"):
         subprocess.run([sys.executable, ROOT / "tests" / check, library], check=True, env=env)
+    # Translation catalogues are embedded in the .so; installed payload stays two files.
 print(f"{expected}: one qualified {profile} module, passive documentation, no installed helpers")

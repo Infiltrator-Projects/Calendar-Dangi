@@ -1,0 +1,29 @@
+{
+  "title": "Korean Dangi Calendar",
+  "intro": "The Dangi calendar is part of Korea's historical way of dating years, associated with the legendary founder Dangun. The traditional lunar months follow the Moon while the year is kept in step with the seasons.",
+  "diagram": "lunisolar",
+  "diagram_caption": "MOON MONTHS, LEAP MONTHS AND SOLAR SEASONS",
+  "caption_detail": "The cycle of new moons gives lunar month boundaries; some years add a leap month to remain aligned with the seasonal year.",
+  "steps": [
+    {
+      "heading": "Start with the lunar month",
+      "text": "Lunar months can contain 29 or 30 days, beginning around the new moon. Their dates move relative to Gregorian months."
+    },
+    {
+      "heading": "Allow for a leap month",
+      "text": "A year may include an extra lunar month, rather than the extra single day used in the modern Gregorian calendar."
+    },
+    {
+      "heading": "Do not confuse year systems",
+      "text": "The Dangi era describes a historical method of counting years. Korean lunar month/day reckoning and modern civil Gregorian dates are distinct."
+    }
+  ],
+  "example": "An autumn lunar celebration can fall on different dates in September or October on the Gregorian calendar. The same numbered lunar date does not always mean the same Gregorian day.",
+  "history": "Korean lunisolar reckoning influenced historical festivals and seasonal life. The Dangi era refers to the legendary foundation of Korea by Dangun; it should not be mistaken for a modern astronomical measurement of that era.",
+  "model": "The provider contains its own Korean lunisolar year tables for 1900-2100, checked against KASI-based published dates from 1900-01-31 through 2050-11-18. Later table dates are predictions. ICU supplies locale text and projection beyond the owned data.",
+  "limits": "The date model does not certify historical calculations for every Korean court, locality or era. Future projections may differ from official calendars. South Korea's current civil calendar is Gregorian.",
+  "sources": [
+    "Korea Astronomy and Space Science Institute: https://astro.kasi.re.kr/kor/life/pageView/5",
+    "Provider model and qualifications: https://github.com/Infiltrator-Projects/Calendar-Dangi/blob/main/docs/MODEL.md"
+  ]
+}
