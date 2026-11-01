@@ -213,6 +213,20 @@ def build_deb(profile, output, jobs):
                 destination_mo.parent.mkdir(parents=True, exist_ok=True)
                 run(["msgfmt", "--check", "-o", destination_mo, ROOT / "i18n" / (language + ".po")])
             run([sys.executable, "tests/check_translations.py", target, ROOT / "build/package/test-locales"])
+        # Runtime package contract: exactly one native SO and one PDF.
+        # Development documents, translations, scripts and tests must not ship.
+        expected_payload = {
+            RESOURCE.as_posix(),
+            (DOCUMENTATION / (MANIFEST["name"] + ".pdf")).as_posix(),
+        }
+        actual_payload = {
+            path.relative_to(stage).as_posix()
+            for path in (stage / "System").rglob("*") if path.is_file()
+        }
+        if actual_payload != expected_payload:
+            raise RuntimeError("Unexpected installed files: " + repr(sorted(actual_payload)))
+        if guide.read_bytes()[:5] != b"%PDF-":
+            raise RuntimeError("Illustrated user manual is not a valid PDF")
         control = stage / "DEBIAN"
         control.mkdir()
         (control / "control").write_text(
