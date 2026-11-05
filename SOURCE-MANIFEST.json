@@ -314,7 +314,7 @@
       "selected_definitions": []
     }
   ],
-  "copy_method": "Historic Common 1.19.78 source copy preserved as provenance; builds link exact Common 1.19.80.",
+  "copy_method": "Historic Common 1.19.78 source copy preserved as provenance; builds link exact Common 1.19.81.",
   "verification": {
     "repository": "Calendar-Dangi",
     "compared_observations": 883,
@@ -329,8 +329,8 @@
   "common_dependency": {
     "type": "git-submodule",
     "path": "common",
-    "revision": "dc4aac326964ca4400b6e21851d16eea674040c8",
-    "version": "1.19.80",
+    "revision": "a99ef676b0e43c7e645c81756e3fd38be0a54406",
+    "version": "1.19.81",
     "linkage": "static"
   }
 }

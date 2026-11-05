@@ -13,7 +13,7 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 manifest = json.loads((ROOT / "SOURCE-MANIFEST.json").read_text())
 resource = Path("System/Resources") / ("Calendars" if manifest["kind"] == "calendar" else "Clocks") / (manifest["name"] + ".so")
-documentation = Path("System/Resources/Documentation") / manifest["repository"]
+documentation = Path("System/Resources/Documentation") / (manifest["repository"] + ".pdf")
 package, profile = Path(sys.argv[1]).resolve(), sys.argv[2]
 expected = "infiltrator-" + manifest["repository"].lower()
 assert subprocess.check_output(["dpkg-deb", "-f", package, "Package"], text=True).strip() == expected
@@ -23,6 +23,7 @@ with tempfile.TemporaryDirectory(prefix="provider-payload-") as temporary:
     root = Path(temporary)
     subprocess.run(["dpkg-deb", "--extract", package, root], check=True)
     files = [p for p in root.rglob("*") if not p.is_dir()]
+    assert not any(p.is_dir() for p in (root / "System/Resources/Documentation").iterdir())
     locales = ROOT / "i18n/LINGUAS"
     translated_paths = set()
     if locales.exists():
@@ -32,10 +33,10 @@ with tempfile.TemporaryDirectory(prefix="provider-payload-") as temporary:
     for file in files:
         relative = file.relative_to(root)
         assert not file.is_symlink()
-        assert relative in {resource, documentation / (manifest["name"] + ".pdf")}, relative
+        assert relative in {resource, documentation}, relative
         assert file.stat().st_mode & 0o777 == 0o644, relative
     library = root / resource
-    guide = root / documentation / (manifest["name"] + ".pdf")
+    guide = root / documentation
     assert guide.read_bytes().startswith(b"%PDF-")
     def field(name):
         return subprocess.check_output(["dpkg-deb", "-f", package, name], text=True).strip()

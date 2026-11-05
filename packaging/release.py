@@ -29,7 +29,7 @@ VERSION = (ROOT / "VERSION").read_text().strip()
 if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", VERSION):
     raise ValueError("VERSION must contain a three-part release version")
 RESOURCE = Path("System/Resources") / ("Calendars" if MANIFEST["kind"] == "calendar" else "Clocks") / (MANIFEST["name"] + ".so")
-DOCUMENTATION = Path("System/Resources/Documentation") / REPOSITORY
+DOCUMENTATION = Path("System/Resources/Documentation") / (REPOSITORY + ".pdf")
 EXCLUDED = {".git", "build", "dist", "__pycache__", ".build", ".pytest_cache"}
 
 
@@ -187,9 +187,9 @@ def build_deb(profile, output, jobs):
         shutil.copyfile(library, target)
         target.chmod(0o644)
         documentation = stage / DOCUMENTATION
-        documentation.mkdir(parents=True)
+        documentation.parent.mkdir(parents=True)
         # User-facing provider payload: one illustrated PDF, no source copies.
-        guide = documentation / (MANIFEST["name"] + ".pdf")
+        guide = documentation
         run([sys.executable, "packaging/build_guide.py", "docs/GUIDE.json", guide])
         info = (f"Version: {VERSION}\nPackage version: {package_version}\nRepository: {REPOSITORY}\n"
                 f"Source revision: {revision()}\nArchitecture: {arch}\nProfile: {profile}\n"
@@ -217,7 +217,7 @@ def build_deb(profile, output, jobs):
         # Development documents, translations, scripts and tests must not ship.
         expected_payload = {
             RESOURCE.as_posix(),
-            (DOCUMENTATION / (MANIFEST["name"] + ".pdf")).as_posix(),
+            DOCUMENTATION.as_posix(),
         }
         actual_payload = {
             path.relative_to(stage).as_posix()

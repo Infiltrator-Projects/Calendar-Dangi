@@ -48,4 +48,4 @@ Each package owns only this provider and its passive documentation. Its `Replace
 
 ## Two-file installed guide
 
-Only `Korean Dangi Calendar.so` and the illustrated `Korean Dangi Calendar.pdf` are installed as provider files. The PDF is written for ordinary readers using `docs/GUIDE.json`; technical documentation remains in GitHub.
+Only `Korean Dangi Calendar.so` and the illustrated `Calendar-Dangi.pdf` are installed as provider files. The PDF is written for ordinary readers using `docs/GUIDE.json`; technical documentation remains in GitHub.
