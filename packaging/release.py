@@ -4,9 +4,7 @@
 from __future__ import annotations
 
 import argparse
-import gzip
 import hashlib
-import io
 import json
 import os
 from pathlib import Path
@@ -16,9 +14,7 @@ import shlex
 import shutil
 import subprocess
 import sys
-import tarfile
 import tempfile
-import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = json.loads((ROOT / "SOURCE-MANIFEST.json").read_text())
@@ -30,29 +26,12 @@ if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", VERSION):
     raise ValueError("VERSION must contain a three-part release version")
 RESOURCE = Path("System/Resources") / ("Calendars" if MANIFEST["kind"] == "calendar" else "Clocks") / (MANIFEST["name"] + ".so")
 DOCUMENTATION = Path("System/Resources/Documentation") / (REPOSITORY + ".pdf")
-EXCLUDED = {".git", "build", "dist", "__pycache__", ".build", ".pytest_cache"}
 
 
 def run(args, *, cwd=ROOT, env=None, capture=False):
     print("+ " + shlex.join(map(str, args)), flush=True)
     return subprocess.run(list(map(str, args)), cwd=cwd, env=env, check=True,
                           text=True, stdout=subprocess.PIPE if capture else None).stdout
-
-
-def source_files():
-    files = []
-    for folder, directories, names in os.walk(ROOT):
-        directories[:] = sorted(d for d in directories if d not in EXCLUDED)
-        for name in sorted(names):
-            path = Path(folder) / name
-            if name == ".git":
-                continue
-            if path.is_symlink():
-                raise ValueError("Source symlinks are not supported: " + str(path))
-            if name.endswith((".pyc", ".deb", ".run", ".zip", ".gcda", ".gcno")):
-                continue
-            files.append(path.relative_to(ROOT))
-    return sorted(files)
 
 
 def revision():
@@ -63,7 +42,7 @@ def revision():
 
 
 def epoch():
-    # Fixed archive timestamps make all three artifacts independently reproducible.
+    # Fixed archive timestamps make the portable package independently reproducible.
     value = os.environ.get("SOURCE_DATE_EPOCH", "1704067200")
     if not value.isdecimal():
         raise ValueError("Invalid SOURCE_DATE_EPOCH")
@@ -252,37 +231,32 @@ def build_deb(profile, output, jobs):
     return destination
 
 
-def archive_sources():
-    entries = {str(path): (ROOT / path).read_bytes() for path in source_files()}
-    entries["SOURCE-REVISION"] = (revision() + "\n").encode()
-    buffer = io.BytesIO()
-    with tarfile.open(fileobj=buffer, mode="w", format=tarfile.USTAR_FORMAT) as archive:
-        for name, data in sorted(entries.items()):
-            item = tarfile.TarInfo("source/" + name)
-            item.size, item.mtime, item.mode = len(data), epoch(), 0o644
-            archive.addfile(item, io.BytesIO(data))
-    return entries, gzip.compress(buffer.getvalue(), mtime=0)
-
-
 def release(output, jobs):
     output.mkdir(parents=True, exist_ok=True)
     if any(output.iterdir()):
         raise RuntimeError("Release output directory must be empty")
     build_deb("portable", output, jobs)
-    entries, payload = archive_sources()
-    prefix = f"{SLUG}-{VERSION}"
-    with zipfile.ZipFile(output / (prefix + "-source.zip"), "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for name, data in sorted(entries.items()):
-            item = zipfile.ZipInfo(prefix + "/" + name, (2024, 1, 1, 0, 0, 0))
-            item.external_attr = 0o100644 << 16
-            item.compress_type = zipfile.ZIP_DEFLATED
-            archive.writestr(item, data)
-    header = (ROOT / "packaging/run-header.sh").read_text().replace("@PAYLOAD_SHA256@", hashlib.sha256(payload).hexdigest())
-    installer = output / (prefix + "-native-installer.run")
-    installer.write_bytes(header.encode() + payload)
+    source = run(["git", "rev-parse", "HEAD"], capture=True).strip()
+    if not re.fullmatch(r"[0-9a-f]{40}", source) or revision() != source:
+        raise RuntimeError("Release source must be an exact Git commit")
+    gitlink = run(["git", "ls-tree", source, "--", "common"], capture=True).split()
+    if len(gitlink) != 4 or gitlink[0:2] != ["160000", "commit"] or gitlink[3] != "common":
+        raise RuntimeError("Missing pinned Common gitlink")
+    common = gitlink[2]
+    if not re.fullmatch(r"[0-9a-f]{40}", common) or run(["git", "-C", "common", "rev-parse", "HEAD"], capture=True).strip() != common:
+        raise RuntimeError("Common source identity mismatch")
+    if not re.fullmatch(r"Calendar-[A-Za-z0-9-]+", REPOSITORY):
+        raise RuntimeError("Invalid provider repository")
+    header = (ROOT / "packaging/run-header.sh").read_text()
+    for token, value in (("@REPOSITORY@", REPOSITORY), ("@VERSION@", VERSION),
+                         ("@SOURCE_COMMIT@", source), ("@COMMON_COMMIT@", common)):
+        header = header.replace(token, value)
+    installer = output / (f"{SLUG}-{VERSION}-native-installer.run")
+    installer.write_text(header)
     installer.chmod(0o755)
-    if len(list(output.iterdir())) != 3:
-        raise RuntimeError("A release must have exactly three assets")
+    run(["bash", "-n", installer])
+    if installer.stat().st_size >= 16384 or len(list(output.iterdir())) != 2:
+        raise RuntimeError("Expected a text-only RUN and one portable DEB")
     print("Release assets: " + ", ".join(p.name for p in sorted(output.iterdir())))
 
 

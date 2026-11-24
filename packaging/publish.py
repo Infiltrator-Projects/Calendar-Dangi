@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Publish exactly the qualified DEB, native RUN and complete source ZIP."""
+"""Publish exactly the qualified DEB and network-only native RUN."""
 import hashlib
 import json
 import os
@@ -26,7 +26,7 @@ source = os.environ["GITHUB_SHA"]
 repository = os.environ["GITHUB_REPOSITORY"]
 assert contract["commit"] == source
 assets = contract["assets"]
-assert len(assets) == 3 and {Path(x).suffix for x in assets} == {".deb", ".run", ".zip"}
+assert len(assets) == 2 and {Path(x).suffix for x in assets} == {".deb", ".run"}
 for name, digest in assets.items():
     assert Path(name).name == name
     assert hashlib.sha256((root / name).read_bytes()).hexdigest() == digest
@@ -50,7 +50,7 @@ if existing:
 else:
     gh("release", "create", tag, *paths, "--target", source, "--draft",
        "--title", contract["name"] + " " + contract["version"],
-       "--notes", "Portable amd64 Debian package, hardware-native source installer (aggressive CPU tuning, LTO and two-pass PGO), and complete source ZIP. Each package installs this provider only.")
+       "--notes", "Portable amd64 Debian package, hardware-native source installer (aggressive CPU tuning, LTO and two-pass PGO); GitHub provides the automatic source archive. Each package installs this provider only.")
 
 
 def verify():
@@ -66,4 +66,4 @@ verify()
 if not existing or existing["isDraft"]:
     gh("release", "edit", tag, "--draft=false", "--latest")
 verify()
-print("Published and byte-verified " + tag + " with exactly three assets.")
+print("Published and byte-verified " + tag + " with exactly two assets.")
