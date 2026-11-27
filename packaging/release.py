@@ -50,7 +50,7 @@ def epoch():
 
 
 def check_requirements():
-    missing = [x for x in ("gcc", "make", "pkg-config", "dpkg", "dpkg-deb", "readelf", "strip") if not shutil.which(x)]
+    missing = [x for x in ("gcc", "make", "pkg-config", "dpkg", "dpkg-deb", "readelf", "strip", "jq", "ps2pdf", "iconv", "fold") if not shutil.which(x)]
     if (ROOT / "i18n/LINGUAS").exists() and not shutil.which("msgfmt"):
         missing.append("msgfmt")
     if (ROOT / "i18n/LINGUAS").exists():
@@ -58,9 +58,6 @@ def check_requirements():
         has_utf8 = any(name.lower().replace("-", "").endswith(".utf8") and not name.lower().startswith("c.") for name in available)
         if not has_utf8 and (not shutil.which("localedef") or not Path("/usr/share/i18n/locales/en_US").exists()):
             missing.append("UTF-8 locale data (locales)")
-    if subprocess.run([sys.executable, "-c", "import reportlab"], stdout=subprocess.DEVNULL,
-                      stderr=subprocess.DEVNULL).returncode:
-        missing.append("python3-reportlab")
     dependencies = MANIFEST["build_dependencies"]
     if not missing and dependencies:
         if subprocess.run(["pkg-config", "--exists", *dependencies]).returncode:
@@ -77,7 +74,7 @@ def ensure_requirements(provision):
     if os.geteuid() != 0:
         command = ["sudo", "--", *command]
     run([*command, "update"])
-    packages = ["build-essential", "binutils", "pkg-config", "python3", "python3-reportlab"]
+    packages = ["build-essential", "binutils", "pkg-config", "python3", "jq", "ghostscript"]
     if (ROOT / "i18n/LINGUAS").exists():
         packages += ["gettext", "locales"]
     if "glib-2.0" in MANIFEST["build_dependencies"]:
@@ -164,9 +161,9 @@ def build_deb(profile, output, jobs):
         target.chmod(0o644)
         documentation = stage / DOCUMENTATION
         documentation.parent.mkdir(parents=True)
-        # User-facing provider payload: one illustrated PDF, no source copies.
+        # User-facing provider payload: one provider-owned PDF, no source copies.
         guide = documentation
-        run([sys.executable, "packaging/build_guide.py", "docs/GUIDE.json", guide])
+        run(["bash", str(ROOT / "common/calendar-tools/guide.sh"), str(guide)])
         info = (f"Version: {VERSION}\nPackage version: {package_version}\nRepository: {REPOSITORY}\n"
                 f"Source revision: {revision()}\nArchitecture: {arch}\nProfile: {profile}\n"
                 f"C flags: {shlex.join(flags)}\nLTO: enabled\n"

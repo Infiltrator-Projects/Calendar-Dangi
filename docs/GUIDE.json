@@ -1,9 +1,6 @@
 {
   "title": "Korean Dangi Calendar",
   "intro": "Traditional Korean lunisolar reckoning combines lunar months and the seasonal solar year. Dangi year numbering is associated with Korea's legendary founder Dangun.",
-  "diagram": "lunisolar",
-  "diagram_caption": "MOON MONTHS, LEAP MONTHS AND SOLAR SEASONS",
-  "caption_detail": "The diagram illustrates lunar months in relation to the seasonal year.",
   "steps": [
     {
       "heading": "Start with the lunar month",
