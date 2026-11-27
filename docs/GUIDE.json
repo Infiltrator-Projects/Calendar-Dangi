@@ -17,10 +17,11 @@
   ],
   "example": "A traditional autumn lunar celebration can fall on different Gregorian dates in September or October. Identify the lunar year, month, day and leap-month status before conversion.",
   "history": "Korean lunisolar reckoning has long governed traditional festivals and seasonal life. The legendary foundation era is a chronological convention, not a modern astronomical measurement.",
-  "model": "The provider owns Korean year tables for 1900–2100. Published KASI-based dates from 1900-01-31 through 2050-11-18 were checked independently; subsequent table dates are predictions. ICU supplies locale text and projection outside that range.",
-  "limits": "The model does not certify every historic court, locality or era. Future projections may differ from official calendars. South Korea's contemporary civil calendar is Gregorian.",
+  "model": "The provider owns Korean year tables for 1900–2100. Published KASI-based dates from 1900-01-31 through 2050-11-18 were checked independently; subsequent table dates are predictions. ICU supplies locale text and projection outside that range. Month navigation counts intercalary months separately. Year navigation from a leap month absent in the destination year selects the following ordinary month; day numbers clamp to the target month length. Zero-step navigation preserves the date.",
+  "limits": "The model does not certify every historic court, locality or era. Future projections may differ from official calendars. South Korea's contemporary civil calendar is Gregorian. The date-only representation does not implement a sunset rollover.",
   "sources": [
     "Korea Astronomy and Space Science Institute: https://astro.kasi.re.kr/kor/life/pageView/5",
-    "Provider model and qualifications: https://github.com/Infiltrator-Projects/Calendar-Dangi/blob/main/docs/MODEL.md"
+    "Provider model and qualifications: https://github.com/Infiltrator-Projects/Calendar-Dangi/blob/main/docs/MODEL.md",
+    "Historical qualification: https://github.com/Infiltrator-Projects/Calendar-Dangi/blob/main/docs/FORENSIC-AUDIT.md"
   ]
 }
